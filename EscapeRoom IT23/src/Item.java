@@ -1,4 +1,6 @@
-public abstract class Item {
+import java.io.Serializable;
+
+public abstract class Item implements Serializable {
     protected Position position;
 
     public Item() {
@@ -16,6 +18,6 @@ public abstract class Item {
     public void setPosition(Position position) {
         this.position = position;
 
-        System.out.println("The item is at position x:" + this.position.getX() + " y:" + this.position.getY() + ".");
+        System.out.println("The item is at position " + this.position.getPositionString() + ".");
     }
 }

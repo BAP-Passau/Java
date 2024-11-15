@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Room {
+public class Room implements Serializable {
     private Player player;
     private Integer roomLength;
     private Integer roomWidth;
@@ -31,7 +32,7 @@ public class Room {
             validDoorPositions.add(new Position(x, this.roomLength));
         }
 
-        for (int y = 0; y < this.roomLength; y++) {
+        for (int y = 1; y < this.roomLength; y++) {
             validDoorPositions.add(new Position(0, y));
             validDoorPositions.add(new Position(this.roomWidth, y));
         }
@@ -59,9 +60,19 @@ public class Room {
             this.validDoorPositions.remove(doorPosition);
         }
 
+        this.items.addAll(coins);
+
+        /*
         for (Coin coin : coins) {
             this.items.add(coin);
         }
+
+         */
+    }
+
+    @Override
+    public String toString() {
+        return "Gamestate EscapeRoom";
     }
 
     public void placePlayer(Player player) {
@@ -75,6 +86,9 @@ public class Room {
     }
 
     public void print() {
+        // clear console
+        // System.out.println("\f");
+
         for (int y = 0; y <= this.roomLength; y++) {
             for (int x = 0; x <= this.roomWidth; x++) {
                 Position paintPos = new Position(x, y);
@@ -123,38 +137,44 @@ public class Room {
                             System.out.print("€");
                         }
                     }
-                } else if (x == this.player.getPosition().getX() && y == this.player.getPosition().getY()) {
+                } else if (new Position(x, y).equals(this.player.getPosition())) {
                     System.out.print("P");
                 } else {
                     boolean keyNearby = false;
                     boolean coinNearby = false;
 
                     if (!this.getKeys().isEmpty()) {
-                        for (Key key : this.getKeys()) {
-                            ArrayList<Position> keyArea = key.keyArea();
-
-                            if (!this.player.getItems().contains(key)) {
-                                for (Position pos : keyArea) {
-                                    if (x == pos.getX() && y == pos.getY()) {
-                                        keyNearby = true;
-                                        break;
-                                    }
-                                }
+                        for (Position pos : (
+                                this.getKeys()
+                                        .stream()
+                                        .filter(k -> !this.player
+                                                .getItems()
+                                                .contains(k)))
+                                .toList()
+                                .stream()
+                                .map(k -> k.getPosition())
+                                .toList()) {
+                            if (new Position(x, y).distanceTo(pos) <= Distance.KEY_AREA_DISTANCE.value) {
+                                keyNearby = true;
+                                break;
                             }
                         }
                     }
 
                     if (!this.getCoins().isEmpty()) {
-                        for (Coin coin : this.getCoins()) {
-                            ArrayList<Position> coinArea = coin.coinArea();
-
-                            if (!this.player.getItems().contains(coin)) {
-                                for (Position pos : coinArea) {
-                                    if (x == pos.getX() && y == pos.getY()) {
-                                        coinNearby = true;
-                                        break;
-                                    }
-                                }
+                        for (Position pos : (
+                                this.getCoins()
+                                        .stream()
+                                        .filter(c -> !this.player
+                                                .getItems()
+                                                .contains(c)))
+                                .toList()
+                                .stream()
+                                .map(c -> c.getPosition())
+                                .toList()) {
+                            if (new Position(x, y).distanceTo(pos) <= Distance.COIN_AREA_DISTANCE.value) {
+                                coinNearby = true;
+                                break;
                             }
                         }
                     }
@@ -182,7 +202,7 @@ public class Room {
     }
 
     protected List<Position> getKeyPositions() {
-        return this.getKeys().stream().map(Item::getPosition).toList();
+        return this.getKeys().stream().map(k -> k.getPosition()).toList();
     }
 
     protected boolean compareKeyPositions(Position position) {
@@ -211,7 +231,7 @@ public class Room {
     }
 
     protected List<Position> getCoinPositions() {
-        return this.getCoins().stream().map(Item::getPosition).toList();
+        return this.getCoins().stream().map(c -> c.getPosition()).toList();
     }
 
     protected boolean compareCoinPositions(Position position) {
@@ -228,7 +248,7 @@ public class Room {
     }
 
     protected List<Position> getDoorPositions() {
-        return this.getDoors().stream().map(Door::getPosition).toList();
+        return this.getDoors().stream().map(d -> d.getPosition()).toList();
     }
 
     protected boolean compareDoorPositions(Position position) {

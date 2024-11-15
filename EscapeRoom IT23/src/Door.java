@@ -1,11 +1,13 @@
-public class Door {
+import java.io.Serializable;
+
+public class Door implements Serializable {
     private Position position;
     private Key key;
 
     public Door(Key key, Position position) {
         this.position = position;
 
-        System.out.println("The door is at position x:" + this.position.getX() + " y:" + this.position.getY() + ".");
+        System.out.println("The door is at position " + this.position.getPositionString() + ".");
 
         this.key = key;
     }

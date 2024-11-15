@@ -13,33 +13,14 @@ public class Key extends Item {
         this.price = r.nextInt(1, 4);
         this.coins = new ArrayList<>();
 
-        System.out.println("The key is at position x:" + this.position.getX() + " y:" + this.position.getY() + ".");
+        System.out.println("The key is at position " + this.position.getPositionString() + ".");
     }
 
     @Override
     public void setPosition(Position position) {
         this.position = position;
 
-        System.out.println("The key is at position x:" + this.position.getX() + " y:" + this.position.getY() + ".");
-    }
-
-    public ArrayList<Position> keyArea() {
-        ArrayList<Position> keyArea = new ArrayList<>();
-
-        int keyXPos = this.position.getX();
-        int keyYPos = this.position.getY();
-
-        for (int x = keyXPos - 3; x < keyXPos + 4; x++) {
-            for (int y = keyYPos - 3; y < keyYPos + 4; y++) {
-                Position keyAreaPos = new Position(x, y);
-
-                if (!keyAreaPos.equals(this.position)) {
-                    keyArea.add(new Position(x, y));
-                }
-            }
-        }
-
-        return keyArea;
+        System.out.println("The key is at position " + this.position.getPositionString() + ".");
     }
 
     public ArrayList<Coin> getCoins() {

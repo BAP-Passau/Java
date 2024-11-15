@@ -2,12 +2,22 @@ import java.util.Scanner;
 
 public class Game {
     public static void main(String[] args) {
-        Room room = new Room();
-        Player player = new Player();
+        GameState gameState = GameState.getInstance();
+        Room room;
+        Player player;
+
+        if (gameState.loadGameState()) {
+            room = gameState.getRoom();
+            player = gameState.getRoom().getPlayer();
+        } else {
+            room = new Room();
+            player = new Player();
+            room.placePlayer(player);
+        }
 
         System.out.println("The room has a length of " + room.getRoomLength() + " and a width of " + room.getRoomWidth() + ".");
 
-        room.placePlayer(player);
+        gameState.setRoom(room);
 
         String command = "";
         int steps = 0;
@@ -23,7 +33,7 @@ public class Game {
                 command = scanner.nextLine();
             }
             catch (Exception e) {
-                System.out.println("Something went wrong,.");
+                System.out.println("Something went wrong.");
             }
 
             switch (command.toLowerCase()) {
@@ -38,6 +48,7 @@ public class Game {
             }
 
             if (!play) {
+                gameState.saveGameState();
                 break;
             }
 

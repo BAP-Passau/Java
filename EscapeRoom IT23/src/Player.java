@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Player {
+public class Player implements Serializable {
     private Position position;
     private Room room;
     private Directions currentDirection;
@@ -143,7 +144,7 @@ public class Player {
 
         if (proceedGame) {
             System.out.println("Player is going " + this.currentDirection + ".");
-            System.out.println("Player's current position is x:" + this.position.getX() + " y:" + this.position.getY() + ".");
+            System.out.println("Player's current position is " + this.position.getPositionString() + ".");
         }
 
         return proceedGame;
@@ -175,14 +176,8 @@ public class Player {
     }
 
     private void keyRadar() {
-        ArrayList<Position> keyArea = new ArrayList<>();
-
-        for (Key key: this.getRoom().getKeys()) {
-            keyArea.addAll(key.keyArea());
-        }
-
-        for (Position pos : keyArea) {
-            if (pos.equals(this.position)) {
+        for (Position pos : this.getRoom().getKeys().stream().map(k -> k.getPosition()).toList()) {
+            if (pos.distanceTo(this.position) <= Distance.KEY_AREA_DISTANCE.value) {
                 System.out.println("Key nearby.");
 
                 break;
@@ -199,15 +194,9 @@ public class Player {
     }
 
     private void coinRadar() {
-        ArrayList<Position> coinArea = new ArrayList<>();
-
-        for (Coin coin: this.getRoom().getCoins()) {
-            coinArea.addAll(coin.coinArea());
-        }
-
-        for (Position pos : coinArea) {
-            if (pos.equals(this.position)) {
-                System.out.println("Coin nearby.");
+        for (Position pos : this.getRoom().getCoins().stream().map(c -> c.getPosition()).toList()) {
+            if (pos.distanceTo(this.position) <= Distance.COIN_AREA_DISTANCE.value) {
+                System.out.println("Key nearby.");
 
                 break;
             }
@@ -253,7 +242,7 @@ public class Player {
         System.out.println("=== Your keys ===");
 
         for (Key key : this.getKeys()) {
-            System.out.println(Integer.toString(this.getKeys().indexOf(key)) + ": price " + Integer.toString(key.getPrice()) + ", posX " + Integer.toString(key.getPosition().getX()) + ", posY " + Integer.toString(key.getPosition().getY()));
+            System.out.println(Integer.toString(this.getKeys().indexOf(key) + 1) + ": price " + Integer.toString(key.getPrice()) + ", " + key.getPosition().getPositionString());
         }
 
         System.out.println();
@@ -262,7 +251,7 @@ public class Player {
         try {
             Scanner scanner = new Scanner(System.in);
             int keyNumber = Integer.parseInt(System.console().readLine());
-            Key key = this.getKeys().get(keyNumber);
+            Key key = this.getKeys().get(keyNumber - 1);
 
             this.items.addAll(key.getCoins());
             key.getCoins().clear();
